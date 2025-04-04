@@ -12,6 +12,8 @@ from ..utils.runtime_tasks import install_lib_if_missing
 from ..utils.logging import get_glue_logger
 from ..utils.runtime_tasks import str_to_class
 import os
+from azure.ai.inference import ChatCompletionsClient
+from azure.core.credentials import AzureKeyCredential
 logger = get_glue_logger(__name__)
 
 def call_api(messages):
@@ -28,6 +30,26 @@ def call_api(messages):
         messages=messages,
         temperature=0.0,
         )
+    elif os.environ['USE_MISTRAL_API'] == "True":
+        api_key = os.getenv("AZURE_INFERENCE_CREDENTIAL", '')
+        if not api_key:
+            raise Exception("A key should be provided to invoke the endpoint")
+
+        client = ChatCompletionsClient(
+            endpoint='https://Mistral-Nemo-maamt.eastus.models.ai.azure.com',
+            credential=AzureKeyCredential(api_key)
+        )
+
+        payload = {
+            "messages": messages,
+            "max_tokens": 200,
+            "temperature": 0.8,
+            "top_p": 0.1
+        }
+
+        response = client.complete(payload)
+        prediction = response.choices[0].message.content
+        return prediction
     else:
         token_provider = get_bearer_token_provider(
                 AzureCliCredential(), "https://cognitiveservices.azure.com/.default"
@@ -185,7 +207,7 @@ class LLMMgr:
         :return: Dict of token-type and count of tokens used
         """
         token_counter = get_token_counter(llm_handle)
-        if token_counter:
+        if (token_counter):
             return {
                 LLMLiterals.EMBEDDING_TOKEN_COUNT: token_counter.total_embedding_token_count,
                 LLMLiterals.PROMPT_LLM_TOKEN_COUNT: token_counter.prompt_llm_token_count,
