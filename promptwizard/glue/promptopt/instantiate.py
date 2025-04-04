@@ -106,7 +106,7 @@ class GluePromptOpt:
         self.prompt_opt = prompt_opt_cls(training_dataset, base_path, self.setup_config,
                                          self.prompt_pool, self.data_processor, self.logger)
 
-    def get_best_prompt(self,use_examples=False,run_without_train_examples=False,generate_synthetic_examples=False) -> (str, Any):
+    def get_best_prompt(self, use_examples=False, run_without_train_examples=False, generate_synthetic_examples=False) -> (str, Any):
         """
         Call get_best_prompt() method of class PromptOptimizer & return its value.
         :return: (best_prompt, expert_profile)
@@ -115,7 +115,26 @@ class GluePromptOpt:
             identity of described in expert_profile.
         """
         start_time = time.time()
-        self.BEST_PROMPT, self.EXPERT_PROFILE = self.prompt_opt.get_best_prompt(self.prompt_opt_param,use_examples=use_examples,run_without_train_examples=run_without_train_examples,generate_synthetic_examples=generate_synthetic_examples)
+        self.logger.info("Starting get_best_prompt...")
+        self.logger.info(f"Parameters: use_examples={use_examples}, run_without_train_examples={run_without_train_examples}, generate_synthetic_examples={generate_synthetic_examples}")
+
+        try:
+            self.BEST_PROMPT, self.EXPERT_PROFILE = self.prompt_opt.get_best_prompt(
+                self.prompt_opt_param,
+                use_examples=use_examples,
+                run_without_train_examples=run_without_train_examples,
+                generate_synthetic_examples=generate_synthetic_examples
+            )
+            if not self.BEST_PROMPT:
+                self.logger.warning("BEST_PROMPT is empty or None.")
+            if not self.EXPERT_PROFILE:
+                self.logger.warning("EXPERT_PROFILE is empty or None.")
+
+            self.logger.info(f"BEST_PROMPT: {self.BEST_PROMPT}")
+            self.logger.info(f"EXPERT_PROFILE: {self.EXPERT_PROFILE}")
+        except Exception as e:
+            self.logger.error(f"Error while getting best prompt: {e}")
+            raise
 
         self.logger.info(f"Time taken to find best prompt: {(time.time() - start_time)} sec")
         return self.BEST_PROMPT, self.EXPERT_PROFILE

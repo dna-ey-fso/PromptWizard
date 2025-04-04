@@ -20,8 +20,13 @@ class ConfigUpdateRequest(BaseModel):
 def update_config(request: ConfigUpdateRequest):
     file_path = promptopt_config_path
     try:
+        # Vérification si le fichier existe
+        if not os.path.exists(file_path):
+            raise HTTPException(status_code=400, detail=f"Configuration file {file_path} does not exist.")
+
+        # Lecture et mise à jour du fichier YAML
         with open(file_path, 'r') as file:
-            data = yaml.safe_load(file)
+            data = yaml.safe_load(file) or {}
 
         for field, value in request.config_dict.items():
             data[field] = value
@@ -30,18 +35,38 @@ def update_config(request: ConfigUpdateRequest):
             yaml.dump(data, file, default_flow_style=False)
 
         return {"message": "YAML file updated successfully!"}
+    except yaml.YAMLError as e:
+        raise HTTPException(status_code=500, detail=f"YAML error: {str(e)}")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}")
 
 @app.get("/get-best-prompt")
 def get_best_prompt():
     try:
-        gp = GluePromptOpt(promptopt_config_path,
-                           setup_config_path,
-                           dataset_jsonl=None,
-                           data_processor=None)
+        # Vérification si les fichiers de configuration existent
+        if not os.path.exists(promptopt_config_path):
+            raise HTTPException(status_code=400, detail=f"Configuration file {promptopt_config_path} is missing.")
+        if not os.path.exists(setup_config_path):
+            raise HTTPException(status_code=400, detail=f"Setup file {setup_config_path} is missing.")
 
-        best_prompt, expert_profile = gp.get_best_prompt(use_examples=False, run_without_train_examples=True, generate_synthetic_examples=False)
-        return {"best_prompt": best_prompt, "expert_profile": expert_profile}
+        # Initialisation de GluePromptOpt
+        gp = GluePromptOpt(
+            promptopt_config_path,
+            setup_config_path,
+            dataset_jsonl=None,  # Peut être modifié pour inclure un chemin vers un dataset
+            data_processor=None  # Peut être modifié pour inclure un processeur de données
+        )
+
+        # Appel à get_best_prompt avec des options supplémentaires
+        best_prompt, expert_profile = gp.get_best_prompt(
+            use_examples=False,
+            run_without_train_examples=True,
+            generate_synthetic_examples=False
+        )
+
+        return {
+            "best_prompt": best_prompt,
+            "expert_profile": expert_profile
+        }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}")

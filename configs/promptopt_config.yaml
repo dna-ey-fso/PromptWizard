@@ -1,5 +1,5 @@
 answer_format: For each question present the reasoning followed by the correct answer.
-base_instruction:  Let's think step by step.
+base_instruction: Lets think step by step.
 few_shot_count: 5
 generate_expert_identity: true
 generate_intent_keywords: false
@@ -7,14 +7,62 @@ generate_reasoning: true
 max_eval_batches: 6
 min_correct_count: 3
 mutate_refine_iterations: 3
-mutation_rounds: 3
+mutation_rounds: 2
 num_train_examples: 20
 prompt_technique_name: critique_n_refine
 questions_batch_size: 1
 refine_instruction: true
 refine_task_eg_iterations: 3
-seen_set_size: 25
+seen_set_size: 20
 style_variation: 5
-task_description: 'Optimize the following prompt for better results.
+task_description: 'You have to optimize the prompt.
+
+  Question: What is Northwind Health Plus?
+
+  Content: Northwind_Standard_Benefits_Details.pdf#page=1: Contoso Electronics Northwind
+  Health Standard Plan Contoso ElectronicsThis document contains information generated
+  using a language model (Azure OpenAI). The information contained in this document
+  is only for demonstration purposes and does not reflect the opinions or beliefs
+  of Microsoft. Microsoft makes no representations or warranties of any kind, express
+  or implied, about the completeness, accuracy, reliability, suitability or availability
+  with respect to the information contained in this document. All rights reserved
+  to MicrosoftSummary of Benefits Northwind Standard Northwind Standard is a basic
+  plan that provides coverage for medical, vision, and dental services. This plan
+  also offers coverage for preventive care services, as well as prescription drug
+  coverage. With Northwind Standard, you can choose from a variety of in-network providers,
+  including primary care physicians, specialists, hospitals, and pharmacies. This
+  plan does not offer coverage for emergency services, mental health and substance
+  abuse coverage, or out-of-network services.
+
+  Northwind_Standard_Benefits_Details.pdf#page=98:  Right To And Payment Of Benefits
+  OTHER INFORMATION ABOUT THIS PLAN: Right To And Payment Of Benefits The Northwind
+  Standard plan is a comprehensive health plan that provides coverage for medical,
+  vision, and dental services. It also includes preventive care services and prescription
+  drug coverage. Northwind Standard offers a variety of in-network providers, including
+  primary care physicians, specialists, hospitals, and pharmacies.Under this plan,
+  Northwind Health will cover the cost of eligible services you receive, as long as
+  you follow certain rules. Some services may require pre-authorization or be subject
+  to an annual deductible or coinsurance. Northwind Health is also responsible for
+  processing and paying claims correctly. Right to Benefits You have the right to
+  receive the benefits available under the Northwind Standard plan. This includes
+  the right to receive services from any in-network provider, subject to certain rules
+  and regulations. You also have the right to be informed about the types of services
+  that are covered and the costs associated with them. Payment of Benefits Northwind
+  Health is responsible for paying claims correctly.
+
+  Northwind_Standard_Benefits_Details.pdf#page=35:  You should also be sure to communicate
+  your needs to the therapist and discuss any potential risks or side effects. In
+  addition to massage therapy, Northwind Health also offers coverage for other types
+  of physical therapy, such as chiropractic care, physical therapy, and occupational
+  therapy. These services can be used to help with pain relief, improve mobility,
+  and reduce stress. At Contoso, we want our employees to take the time to care for
+  their physical and mental health. We are proud to offer coverage for massage therapy
+  and other physical therapy services through Northwind Health. With this coverage,
+  you can get the care you need to feel your best.Mastectomy and Breast Reconstruction
+  Maternity Care COVERED SERVICES: Maternity Care At Northwind Health, we understand
+  that having a baby can be costly and stressful. To help ease the burden, Northwind
+  Standard offers comprehensive maternity care coverage. Prenatal Care: Northwind
+  Standard covers the costs of prenatal care for the mother, including routine visits
+  with a doctor, laboratory tests, and ultrasounds.'
 top_n: 1
 unique_model_id: gpt-4o
