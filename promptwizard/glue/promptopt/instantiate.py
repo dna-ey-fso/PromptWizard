@@ -119,21 +119,37 @@ class GluePromptOpt:
         self.logger.info(f"Parameters: use_examples={use_examples}, run_without_train_examples={run_without_train_examples}, generate_synthetic_examples={generate_synthetic_examples}")
 
         try:
-            self.BEST_PROMPT, self.EXPERT_PROFILE = self.prompt_opt.get_best_prompt(
+            # Appel à la méthode de génération
+            result = self.prompt_opt.get_best_prompt(
                 self.prompt_opt_param,
                 use_examples=use_examples,
                 run_without_train_examples=run_without_train_examples,
                 generate_synthetic_examples=generate_synthetic_examples
             )
+
+            # Log the raw result for debugging
+            self.logger.info(f"Raw result from get_best_prompt: {result}")
+
+            # Vérification et assignation des résultats
+            if isinstance(result, tuple) and len(result) == 2:
+                self.BEST_PROMPT, self.EXPERT_PROFILE = result
+            else:
+                self.logger.error("Unexpected result format from get_best_prompt. Expected a tuple (best_prompt, expert_profile).")
+                self.BEST_PROMPT, self.EXPERT_PROFILE = None, None
+
+            # Vérification des résultats
             if not self.BEST_PROMPT:
-                self.logger.warning("BEST_PROMPT is empty or None.")
+                self.logger.warning("BEST_PROMPT is empty or None. Using fallback BEST_PROMPT.")
             if not self.EXPERT_PROFILE:
-                self.logger.warning("EXPERT_PROFILE is empty or None.")
+                self.logger.warning("EXPERT_PROFILE is empty or None. Using fallback EXPERT_PROFILE.")
 
             self.logger.info(f"BEST_PROMPT: {self.BEST_PROMPT}")
             self.logger.info(f"EXPERT_PROFILE: {self.EXPERT_PROFILE}")
+        except ConnectionError as e:
+            self.logger.error(f"Connection error during prompt optimization: {e}")
+            raise
         except Exception as e:
-            self.logger.error(f"Error while getting best prompt: {e}")
+            self.logger.error(f"Unexpected error during get_best_prompt: {e}")
             raise
 
         self.logger.info(f"Time taken to find best prompt: {(time.time() - start_time)} sec")

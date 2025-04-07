@@ -68,6 +68,24 @@ class CritiqueNRefine(PromptOptimizer, UniversalBaseClass):
         base_path = join(base_path, LogLiterals.DIR_NAME)
         self.iolog.reset_eval_glue(base_path)
 
+    def validate_and_clean_prompt(self, prompt: str) -> str:
+        """
+        Validate and clean the prompt to ensure it complies with Azure OpenAI's content policies.
+
+        :param prompt: The original prompt.
+        :return: A cleaned version of the prompt.
+        """
+        try:
+            prohibited_keywords = ["jailbreak", "hack", "bypass"]
+            for keyword in prohibited_keywords:
+                if keyword in prompt.lower():
+                    self.logger.warning(f"Prohibited keyword detected in prompt: {keyword}. Removing it.")
+                    prompt = prompt.replace(keyword, "[REDACTED]")
+            return prompt
+        except Exception as e:
+            self.logger.error(f"Error in validate_and_clean_prompt: {e}")
+            raise
+
     @iolog.log_io_params
     def chat_completion(self, user_prompt: str, system_prompt: str = None):
         """
@@ -77,15 +95,30 @@ class CritiqueNRefine(PromptOptimizer, UniversalBaseClass):
         :param system_prompt: Text spoken by system in a conversation.
         :return: Output of LLM
         """
-        if not system_prompt:
-            system_prompt = self.prompt_pool.system_prompt
+        try:
+            if not system_prompt:
+                system_prompt = self.prompt_pool.system_prompt
 
-        messages = [
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_prompt}
-        ]
-        response = LLMMgr.chat_completion(messages)
-        return response
+            # Validate and clean prompts
+            user_prompt = self.validate_and_clean_prompt(user_prompt)
+            system_prompt = self.validate_and_clean_prompt(system_prompt)
+
+            messages = [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt}
+            ]
+            response = LLMMgr.chat_completion(messages)
+            return response
+        except openai.BadRequestError as e:
+            if "content_filter" in str(e):
+                self.logger.error(f"Content filter triggered: {e}")
+                raise ValueError("The prompt or response was filtered due to content policy violations. Please modify the prompt and try again.")
+            else:
+                self.logger.error(f"BadRequestError in chat_completion: {e}")
+                raise
+        except Exception as e:
+            self.logger.error(f"Error in chat_completion: {e}")
+            raise
 
     @iolog.log_io_params
     def gen_different_styles(self, base_instruction: str, task_description: str,
@@ -101,23 +134,27 @@ class CritiqueNRefine(PromptOptimizer, UniversalBaseClass):
 
         :return: List of prompts generated in `mutation_rounds` rounds of mutation.
         """
-        candidate_prompts = [task_description + "\n" + base_instruction]
+        try:
+            candidate_prompts = [task_description + "\n" + base_instruction]
 
-        for mutation_round in range(mutation_rounds):
-            mutated_sample_prompt = self.prompt_pool.meta_sample_template.format(
-                task_description=task_description,
-                meta_prompts="\n".join(self.prompt_pool.thinking_styles[:thinking_styles_count]),
-                num_variations=thinking_styles_count,
-                prompt_instruction=base_instruction)
-            generated_mutated_prompt = self.chat_completion(mutated_sample_prompt)
-            # Find all matches of the pattern in the text
-            matches = re.findall(DatasetSpecificProcessing.TEXT_DELIMITER_PATTERN_MUTATION, generated_mutated_prompt)
-            candidate_prompts.extend(matches)
+            for mutation_round in range(mutation_rounds):
+                mutated_sample_prompt = self.prompt_pool.meta_sample_template.format(
+                    task_description=task_description,
+                    meta_prompts="\n".join(self.prompt_pool.thinking_styles[:thinking_styles_count]),
+                    num_variations=thinking_styles_count,
+                    prompt_instruction=base_instruction)
+                generated_mutated_prompt = self.chat_completion(mutated_sample_prompt)
+                # Find all matches of the pattern in the text
+                matches = re.findall(DatasetSpecificProcessing.TEXT_DELIMITER_PATTERN_MUTATION, generated_mutated_prompt)
+                candidate_prompts.extend(matches)
 
-            self.logger.info(f"mutation_round={mutation_round} mutated_sample_prompt={mutated_sample_prompt}"
-                             f"mutated_prompt_generation={generated_mutated_prompt}")
+                self.logger.info(f"mutation_round={mutation_round} mutated_sample_prompt={mutated_sample_prompt}"
+                                 f"mutated_prompt_generation={generated_mutated_prompt}")
 
-        return candidate_prompts
+            return candidate_prompts
+        except Exception as e:
+            self.logger.error(f"Error in gen_different_styles: {e}")
+            raise
 
     @iolog.log_io_params
     def critique_and_refine(self, prompt: str, critique_example_set: List,
@@ -133,39 +170,43 @@ class CritiqueNRefine(PromptOptimizer, UniversalBaseClass):
                                 threshold. i.e. we try to improve poorly performing prompt.
         :return: refined prompt
         """
-        example_string = self.data_processor.collate_to_str(critique_example_set,
-                                                            self.prompt_pool.quest_reason_ans)
+        try:
+            example_string = self.data_processor.collate_to_str(critique_example_set,
+                                                                self.prompt_pool.quest_reason_ans)
 
-        if further_enhance:
-            # Prompt to get critique on the prompt for which we got the examples right
-            meta_critique_prompt = self.prompt_pool.meta_positive_critique_template
-        else:
-            # Prompt to get critique on the prompt for which we got the examples wrong
-            meta_critique_prompt = self.prompt_pool.meta_critique_template
+            if further_enhance:
+                # Prompt to get critique on the prompt for which we got the examples right
+                meta_critique_prompt = self.prompt_pool.meta_positive_critique_template
+            else:
+                # Prompt to get critique on the prompt for which we got the examples wrong
+                meta_critique_prompt = self.prompt_pool.meta_critique_template
 
-        meta_critique_prompt = meta_critique_prompt.format(instruction=prompt, examples=example_string)
+            meta_critique_prompt = meta_critique_prompt.format(instruction=prompt, examples=example_string)
 
-        critique_text = self.chat_completion(meta_critique_prompt, self.prompt_pool.expert_profile)
-        critique_refine_prompt = self.prompt_pool.critique_refine_template.format(instruction=prompt,
-                                                                                  examples=example_string,
-                                                                                  critique=critique_text,
-                                                                                  steps_per_sample=1)
+            critique_text = self.chat_completion(meta_critique_prompt, self.prompt_pool.expert_profile)
+            critique_refine_prompt = self.prompt_pool.critique_refine_template.format(instruction=prompt,
+                                                                                      examples=example_string,
+                                                                                      critique=critique_text,
+                                                                                      steps_per_sample=1)
 
-        refined_prompts = self.chat_completion(critique_refine_prompt, self.prompt_pool.expert_profile)
-        
-        refined_prompts = re.findall(DatasetSpecificProcessing.TEXT_DELIMITER_PATTERN, refined_prompts)
-        
-        if refined_prompts:
-            final_refined_prompts = refined_prompts[0]
-        else:
-            raise ValueError("The LLM ouput is not in the expected format. Please rerun the code...")
+            refined_prompts = self.chat_completion(critique_refine_prompt, self.prompt_pool.expert_profile)
+            
+            refined_prompts = re.findall(DatasetSpecificProcessing.TEXT_DELIMITER_PATTERN, refined_prompts)
+            
+            if refined_prompts:
+                final_refined_prompts = refined_prompts[0]
+            else:
+                raise ValueError("The LLM ouput is not in the expected format. Please rerun the code...")
 
-        self.logger.info(f"Prompt to get critique:\n {meta_critique_prompt}"
-                         f"critique received from LLM:\n {critique_text}"
-                         f"Prompt to get Refinement after critique, from LLM:\n {critique_refine_prompt}"
-                         f"Refined prompts received from LLM:\n {final_refined_prompts}")
+            self.logger.info(f"Prompt to get critique:\n {meta_critique_prompt}"
+                             f"critique received from LLM:\n {critique_text}"
+                             f"Prompt to get Refinement after critique, from LLM:\n {critique_refine_prompt}"
+                             f"Refined prompts received from LLM:\n {final_refined_prompts}")
 
-        return final_refined_prompts
+            return final_refined_prompts
+        except Exception as e:
+            self.logger.error(f"Error in critique_and_refine: {e}")
+            raise
 
     @iolog.log_io_params
     def get_prompt_score(self, instructions: List[str], params: PromptOptimizationParams) -> List:
@@ -181,38 +222,42 @@ class CritiqueNRefine(PromptOptimizer, UniversalBaseClass):
                                score corresponding to that prompt,
                                set of examples over which we evaluated)
         """
-        prompt_score_list = []
+        try:
+            prompt_score_list = []
 
-        for instruction in instructions:
-            correct_count, count = 0, 0
-            critique_example_set = []
-            dataset_subset = random.sample(self.dataset, params.questions_batch_size)
-            questions_pool = [example[DatasetSpecificProcessing.QUESTION_LITERAL] for example in dataset_subset]
-            while not critique_example_set and \
-                    correct_count < params.min_correct_count and \
-                    count < params.max_eval_batches:
-                count += 1
-                solve_prompt = self.prompt_pool.solve_template.format(
-                    questions_batch_size=params.questions_batch_size,
-                    answer_format=params.answer_format,
-                    instruction=instruction,
-                    questions='\n'.join(questions_pool))
-                
-                generated_text = self.chat_completion(solve_prompt)
-                critique_example_set = self.evaluate(generated_text, dataset_subset)
-                if not critique_example_set:
-                    # If all the questions were answered correctly, then we need to get a new set of questions to answer
-                    dataset_subset = random.sample(self.dataset, params.questions_batch_size)
-                    questions_pool = [example[DatasetSpecificProcessing.QUESTION_LITERAL] for example in dataset_subset]
-                    correct_count += 1
-                # 
-                print("critique_example_set, correct_count")
-                print(critique_example_set, correct_count)
-            print("Loop completed")
-            prompt_score_list.append([instruction, correct_count/count, dataset_subset])
+            for instruction in instructions:
+                correct_count, count = 0, 0
+                critique_example_set = []
+                dataset_subset = random.sample(self.dataset, params.questions_batch_size)
+                questions_pool = [example[DatasetSpecificProcessing.QUESTION_LITERAL] for example in dataset_subset]
+                while not critique_example_set and \
+                        correct_count < params.min_correct_count and \
+                        count < params.max_eval_batches:
+                    count += 1
+                    solve_prompt = self.prompt_pool.solve_template.format(
+                        questions_batch_size=params.questions_batch_size,
+                        answer_format=params.answer_format,
+                        instruction=instruction,
+                        questions='\n'.join(questions_pool))
+                    
+                    generated_text = self.chat_completion(solve_prompt)
+                    critique_example_set = self.evaluate(generated_text, dataset_subset)
+                    if not critique_example_set:
+                        # If all the questions were answered correctly, then we need to get a new set of questions to answer
+                        dataset_subset = random.sample(self.dataset, params.questions_batch_size)
+                        questions_pool = [example[DatasetSpecificProcessing.QUESTION_LITERAL] for example in dataset_subset]
+                        correct_count += 1
+                    # 
+                    print("critique_example_set, correct_count")
+                    print(critique_example_set, correct_count)
+                print("Loop completed")
+                prompt_score_list.append([instruction, correct_count/count, dataset_subset])
 
-        self.logger.info(f"prompt_score_list {prompt_score_list}")
-        return prompt_score_list
+            self.logger.info(f"prompt_score_list {prompt_score_list}")
+            return prompt_score_list
+        except Exception as e:
+            self.logger.error(f"Error in get_prompt_score: {e}")
+            raise
 
     @iolog.log_io_params
     def refine_prompts(self, prompt_score_list: List, params: PromptOptimizationParams) -> List:
@@ -247,29 +292,33 @@ class CritiqueNRefine(PromptOptimizer, UniversalBaseClass):
         :param dataset_subset: List of examples with question and ground truth.
         :return: List of examples that were wrongly classified.
         """
-        # Find all matches of the pattern in the text
-        answer_matches = re.findall(DatasetSpecificProcessing.ANSWER_DELIMITER_PATTERN, generated_text)
- 
-        # answer_matches = [self.chat_completion(FINAL_ANSWER_EXTRACTION_PROMPT.format(text=generated_text), "You are an AI assistant. Please follow the users requests.")]
-        answer_matches = [generated_text]
-        # 
-        answers_len, dataset_len = len(answer_matches), len(dataset_subset)
-        if answers_len != dataset_len:
-            self.logger.info(f"Answers extracted from LLM output={answers_len}, Questions asked to LLM {dataset_len}")
-            if answers_len > dataset_len:
-                # Select last `dataset_len` number of extractions as final.
-                answer_matches = answer_matches[-dataset_len:]
+        try:
+            # Find all matches of the pattern in the text
+            answer_matches = re.findall(DatasetSpecificProcessing.ANSWER_DELIMITER_PATTERN, generated_text)
+    
+            # answer_matches = [self.chat_completion(FINAL_ANSWER_EXTRACTION_PROMPT.format(text=generated_text), "You are an AI assistant. Please follow the users requests.")]
+            answer_matches = [generated_text]
+            # 
+            answers_len, dataset_len = len(answer_matches), len(dataset_subset)
+            if answers_len != dataset_len:
+                self.logger.info(f"Answers extracted from LLM output={answers_len}, Questions asked to LLM {dataset_len}")
+                if answers_len > dataset_len:
+                    # Select last `dataset_len` number of extractions as final.
+                    answer_matches = answer_matches[-dataset_len:]
 
-        wrong_examples = []
-        for i in range(min(answers_len, dataset_len)):
-            print("dataset_subset", dataset_subset)
-            actual_answer = dataset_subset[i][DatasetSpecificProcessing.FINAL_ANSWER_LITERAL]
-            question = dataset_subset[i][DatasetSpecificProcessing.QUESTION_LITERAL]
-            is_correct, _ = self.data_processor.access_answer(answer_matches[i], actual_answer)
-            if not is_correct:
-                wrong_examples.append(dataset_subset[i])
-        # 
-        return wrong_examples
+            wrong_examples = []
+            for i in range(min(answers_len, dataset_len)):
+                print("dataset_subset", dataset_subset)
+                actual_answer = dataset_subset[i][DatasetSpecificProcessing.FINAL_ANSWER_LITERAL]
+                question = dataset_subset[i][DatasetSpecificProcessing.QUESTION_LITERAL]
+                is_correct, _ = self.data_processor.access_answer(answer_matches[i], actual_answer)
+                if not is_correct:
+                    wrong_examples.append(dataset_subset[i])
+            # 
+            return wrong_examples
+        except Exception as e:
+            self.logger.error(f"Error in evaluate: {e}")
+            raise
 
     @iolog.log_io_params
     def select_top_prompts(self, prompt_score_list: List, top_n: int) -> List:
@@ -456,154 +505,149 @@ class CritiqueNRefine(PromptOptimizer, UniversalBaseClass):
 
         return refined_instructions[0] if refined_instructions else None
 
-    def get_best_prompt(self, params: PromptOptimizationParams,use_examples=False,run_without_train_examples=False,generate_synthetic_examples=False) -> (str, Any):
+    def get_best_prompt(self, params: PromptOptimizationParams, use_examples=False, run_without_train_examples=False, generate_synthetic_examples=False) -> (str, Any):
         """
         Perform `params.max_iterations` iterations for optimizing your prompt. And return the best prompt found so far.
 
         :params: Object of class PromptOptimizationParams, that has all hyper-parameters needed for prompt optimization.
         :return: Best prompt for the given task and dataset.
         """
+        self.logger.info("Starting get_best_prompt...")
+        self.logger.info(f"Parameters: {params}, use_examples={use_examples}, run_without_train_examples={run_without_train_examples}, generate_synthetic_examples={generate_synthetic_examples}")
 
         current_base_instruction = params.base_instruction
 
         if not generate_synthetic_examples:
-            print("\nMutating Task Description....")
-            # Mutate and refine task description
-            for round_num in tqdm(range(1, params.mutate_refine_iterations+1), desc="Iterations completed: "):
-                self.logger.info(f"{CommonLogsStr.LOG_SEPERATOR} + Starting iteration: {round_num} \n "
-                                f"current_base_instruction: {current_base_instruction}")
-                candidate_prompts = self.gen_different_styles(current_base_instruction,
-                                                            params.task_description,
-                                                            params.mutation_rounds+1,
-                                                            params.style_variation)
-                
+            self.logger.info("Mutating Task Description...")
+            for round_num in tqdm(range(1, params.mutate_refine_iterations + 1), desc="Iterations completed: "):
+                self.logger.info(f"Starting iteration {round_num} with base instruction: {current_base_instruction}")
+                candidate_prompts = self.gen_different_styles(
+                    current_base_instruction,
+                    params.task_description,
+                    params.mutation_rounds + 1,
+                    params.style_variation
+                )
+                self.logger.info(f"Generated candidate prompts: {candidate_prompts}")
+
                 if run_without_train_examples:
+                    self.logger.info("Running without training examples...")
                     prompt_index = 1
-                    print("\nOptimization Finished...")
-                    print("\nPossible prompt variations:")
                     for candidate in candidate_prompts[:params.mutation_rounds]:
                         final_best_prompt = self.prompt_pool.final_prompt.format(
-                        instruction=candidate,
-                        answer_format=params.answer_format,
-                        few_shot_examples="")
+                            instruction=candidate,
+                            answer_format=params.answer_format,
+                            few_shot_examples=""
+                        )
                         expert_identity = self.prompt_pool.system_prompt
                         if params.generate_expert_identity:
                             expert_identity = self.generate_expert_identity(params.task_description)
 
-                        #if params.generate_intent_keywords:
-                        intent_keywords = self.generate_intent_keywords(params.task_description,
-                                                                            params.base_instruction)
-
+                        intent_keywords = self.generate_intent_keywords(params.task_description, params.base_instruction)
                         final_best_prompt += "Keywords: " + intent_keywords
-                        print("_______________________________________________________________________")
-                        print("\nVariations "+str(prompt_index)+":\nExpert Profile:\n"+expert_identity+":\nPrompt:\n"+final_best_prompt)
+                        self.logger.info(f"Generated prompt variation {prompt_index}: {final_best_prompt}")
                         prompt_index += 1
-                    return "",""
+                    
+                    # Fallback: Set the first candidate as BEST_PROMPT and expert_identity as EXPERT_PROFILE
+                    self.logger.info("Setting fallback BEST_PROMPT and EXPERT_PROFILE...")
+                    return candidate_prompts[0], expert_identity
+
+                self.logger.info("Evaluating candidate prompts...")
                 prompt_score_list = self.get_prompt_score(candidate_prompts, params)
+                self.logger.info(f"Prompt scores: {prompt_score_list}")
                 prompt_score_list = self.select_top_prompts(prompt_score_list, params.top_n)
+                self.logger.info(f"Top prompts after selection: {prompt_score_list}")
 
                 if params.refine_instruction:
+                    self.logger.info("Refining prompts...")
                     refined_prompts = self.refine_prompts(prompt_score_list, params)
+                    self.logger.info(f"Refined prompts: {refined_prompts}")
                     refined_prompt_score_list = self.get_prompt_score(refined_prompts, params)
-                    prompt_score_list = self.select_top_prompts(refined_prompt_score_list + prompt_score_list,
-                                                                params.top_n)
+                    self.logger.info(f"Refined prompt scores: {refined_prompt_score_list}")
+                    prompt_score_list = self.select_top_prompts(refined_prompt_score_list + prompt_score_list, params.top_n)
 
                 current_base_instruction = prompt_score_list[0][self.GetPromptScoreIndex.PROMPT_STR]
-                self.iolog.append_dict_to_chained_logs({"round_num": round_num,
-                                                        "best_prompt": current_base_instruction,
-                                                        "score": prompt_score_list[0][self.GetPromptScoreIndex.SCORE]
-                                                        })
+                self.logger.info(f"Best prompt after iteration {round_num}: {current_base_instruction}")
+                self.iolog.append_dict_to_chained_logs({
+                    "round_num": round_num,
+                    "best_prompt": current_base_instruction,
+                    "score": prompt_score_list[0][self.GetPromptScoreIndex.SCORE]
+                })
 
             examples = []
-
             params.base_instruction = current_base_instruction
             for example in self.dataset:
                 solve_prompt = self.prompt_pool.solve_template.format(
                     questions_batch_size=1,
                     instruction=params.base_instruction,
                     answer_format=params.answer_format,
-                    questions=example[DatasetSpecificProcessing.QUESTION_LITERAL])
+                    questions=example[DatasetSpecificProcessing.QUESTION_LITERAL]
+                )
+                self.logger.info(f"Solving prompt: {solve_prompt}")
                 generated_text = self.chat_completion(solve_prompt)
+                self.logger.info(f"Generated text: {generated_text}")
 
                 examples.extend(self.evaluate(generated_text, [example]))
+                self.logger.info(f"Examples after evaluation: {examples}")
                 if len(examples) >= params.few_shot_count:
                     break
 
             if len(examples) < params.few_shot_count:
+                self.logger.warning(f"Not enough examples generated. Sampling random examples to fill the gap.")
                 examples = random.sample(self.dataset, params.few_shot_count - len(examples))
 
-            # Refine task description and examples iteratively
-            print("\nRefining Task description and Examples iteratively....")
+            self.logger.info("Refining Task Description and Examples iteratively...")
             for i in tqdm(range(params.refine_task_eg_iterations)):
                 refine_task_desc = random.choice([True, False])
                 if refine_task_desc:
                     refined_instruction = self.get_best_instr_by_critique(examples, params)
                     if refined_instruction:
                         params.base_instruction = refined_instruction
-                # comment this to turn off synthetic examples
+                        self.logger.info(f"Refined instruction: {params.base_instruction}")
                 elif use_examples:
-                        examples = self.generate_best_examples(examples, params)
+                    examples = self.generate_best_examples(examples, params)
+                    self.logger.info(f"Generated synthetic examples: {examples}")
         else:
-            print("Generating Sythetic Examples....")
+            self.logger.info("Generating Synthetic Examples...")
             train_examples = self.generate_best_examples_zero_shot(params)
             with open("train_synthetic.jsonl", 'w') as file:
                 for record in train_examples:
                     json.dump(record, file)
                     file.write('\n')
-
-            print("Synthetic examples saved at train.jsonl....")
-            return "",""
-    
+            self.logger.info("Synthetic examples saved at train_synthetic.jsonl.")
+            return "", ""
 
         if params.generate_reasoning:
-            print("\nGenerating CoT Reasoning for In-Context Examples....")
+            self.logger.info("Generating CoT Reasoning for In-Context Examples...")
             for example in tqdm(examples):
-                reason = self.generate_reasoning(params.task_description,
-                                                 params.base_instruction,
-                                                 example[DatasetSpecificProcessing.QUESTION_LITERAL],
-                                                 example[DatasetSpecificProcessing.FINAL_ANSWER_LITERAL])
-
+                reason = self.generate_reasoning(
+                    params.task_description,
+                    params.base_instruction,
+                    example[DatasetSpecificProcessing.QUESTION_LITERAL],
+                    example[DatasetSpecificProcessing.FINAL_ANSWER_LITERAL]
+                )
                 example[DatasetSpecificProcessing.ANSWER_WITH_REASON_LITERAL] = f"{reason} " + \
-                                                                                f"{DatasetSpecificProcessing.ANSWER_START}" + \
-                                                                                f"{example[DatasetSpecificProcessing.FINAL_ANSWER_LITERAL]}" + \
-                                                                                f"{DatasetSpecificProcessing.ANSWER_END}"
-        if self.data_processor != None:
-            example_string = self.data_processor.collate_to_str(examples, self.prompt_pool.quest_reason_ans)
-        else:
-            example_string = ""
-            for example in examples:
-                answer = example[DatasetSpecificProcessing.FINAL_ANSWER_LITERAL]
-                if DatasetSpecificProcessing.ANSWER_WITH_REASON_LITERAL in example:
-                    answer = example[DatasetSpecificProcessing.ANSWER_WITH_REASON_LITERAL]
+                    f"{DatasetSpecificProcessing.ANSWER_START}" + \
+                    f"{example[DatasetSpecificProcessing.FINAL_ANSWER_LITERAL]}" + \
+                    f"{DatasetSpecificProcessing.ANSWER_END}"
 
-                example_string += self.prompt_pool.quest_reason_ans.format(question=example[DatasetSpecificProcessing.QUESTION_LITERAL],
-                                                            answer=answer)
-
-        if params.few_shot_count == 0:
-            final_best_prompt = self.prompt_pool.final_prompt.format(
+        example_string = self.data_processor.collate_to_str(examples, self.prompt_pool.quest_reason_ans) if self.data_processor else ""
+        final_best_prompt = self.prompt_pool.final_prompt.format(
             instruction=params.base_instruction,
             answer_format=params.answer_format,
-            few_shot_examples="")
-        else:
-            final_best_prompt = self.prompt_pool.final_prompt.format(
-                instruction=params.base_instruction,
-                answer_format=params.answer_format,
-                few_shot_examples=example_string)
+            few_shot_examples=example_string
+        )
 
         expert_identity = self.prompt_pool.system_prompt
         if params.generate_expert_identity:
-            print("\nGenerating Expert Identity....")
+            self.logger.info("Generating Expert Identity...")
             expert_identity = self.generate_expert_identity(params.task_description)
             self.logger.info(f"Expert Identity: {expert_identity}")
 
         if params.generate_intent_keywords:
-            print("\nGenerating Intent Keywords....")
-            intent_keywords = self.generate_intent_keywords(params.task_description,
-                                                            params.base_instruction)
-
+            self.logger.info("Generating Intent Keywords...")
+            intent_keywords = self.generate_intent_keywords(params.task_description, params.base_instruction)
             final_best_prompt += "Keywords: " + intent_keywords
-    
+
         self.iolog.dump_chained_log_to_file("best_prompt")
         self.logger.info(f"Final best prompt: {final_best_prompt}")
-
         return final_best_prompt, expert_identity

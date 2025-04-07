@@ -15,54 +15,63 @@ refine_instruction: true
 refine_task_eg_iterations: 3
 seen_set_size: 20
 style_variation: 5
-task_description: 'You have to optimize the prompt.
-
-  Question: What is Northwind Health Plus?
-
-  Content: Northwind_Standard_Benefits_Details.pdf#page=1: Contoso Electronics Northwind
-  Health Standard Plan Contoso ElectronicsThis document contains information generated
-  using a language model (Azure OpenAI). The information contained in this document
-  is only for demonstration purposes and does not reflect the opinions or beliefs
-  of Microsoft. Microsoft makes no representations or warranties of any kind, express
-  or implied, about the completeness, accuracy, reliability, suitability or availability
-  with respect to the information contained in this document. All rights reserved
-  to MicrosoftSummary of Benefits Northwind Standard Northwind Standard is a basic
-  plan that provides coverage for medical, vision, and dental services. This plan
-  also offers coverage for preventive care services, as well as prescription drug
-  coverage. With Northwind Standard, you can choose from a variety of in-network providers,
-  including primary care physicians, specialists, hospitals, and pharmacies. This
-  plan does not offer coverage for emergency services, mental health and substance
-  abuse coverage, or out-of-network services.
-
-  Northwind_Standard_Benefits_Details.pdf#page=98:  Right To And Payment Of Benefits
-  OTHER INFORMATION ABOUT THIS PLAN: Right To And Payment Of Benefits The Northwind
-  Standard plan is a comprehensive health plan that provides coverage for medical,
-  vision, and dental services. It also includes preventive care services and prescription
-  drug coverage. Northwind Standard offers a variety of in-network providers, including
-  primary care physicians, specialists, hospitals, and pharmacies.Under this plan,
-  Northwind Health will cover the cost of eligible services you receive, as long as
-  you follow certain rules. Some services may require pre-authorization or be subject
-  to an annual deductible or coinsurance. Northwind Health is also responsible for
-  processing and paying claims correctly. Right to Benefits You have the right to
-  receive the benefits available under the Northwind Standard plan. This includes
-  the right to receive services from any in-network provider, subject to certain rules
-  and regulations. You also have the right to be informed about the types of services
-  that are covered and the costs associated with them. Payment of Benefits Northwind
-  Health is responsible for paying claims correctly.
-
-  Northwind_Standard_Benefits_Details.pdf#page=35:  You should also be sure to communicate
-  your needs to the therapist and discuss any potential risks or side effects. In
-  addition to massage therapy, Northwind Health also offers coverage for other types
-  of physical therapy, such as chiropractic care, physical therapy, and occupational
-  therapy. These services can be used to help with pain relief, improve mobility,
-  and reduce stress. At Contoso, we want our employees to take the time to care for
-  their physical and mental health. We are proud to offer coverage for massage therapy
-  and other physical therapy services through Northwind Health. With this coverage,
-  you can get the care you need to feel your best.Mastectomy and Breast Reconstruction
-  Maternity Care COVERED SERVICES: Maternity Care At Northwind Health, we understand
-  that having a baby can be costly and stressful. To help ease the burden, Northwind
-  Standard offers comprehensive maternity care coverage. Prenatal Care: Northwind
-  Standard covers the costs of prenatal care for the mother, including routine visits
-  with a doctor, laboratory tests, and ultrasounds.'
+task_description: "Optimize the prompt for clarity and relevance.\nQuestion: What\
+  \ does Northwind Standard not cover outside of Washington?\nContent: Assistant helps\
+  \ the company employees with their healthcare plan questions, and questions about\
+  \ the employee handbook. Be brief in your answers.\n        Answer ONLY with the\
+  \ facts listed in the list of sources below. If there isnt enough information below,\
+  \ say you dont know. Do not generate answers that dont use the sources below. If\
+  \ asking a clarifying question to the user would help, ask the question.\n     \
+  \   For tabular information return it as an html table. Do not return markdown format.\
+  \ If the question is not in English, answer in the language used in the question.\n\
+  \        Each source has a name followed by colon and the actual information, always\
+  \ include the source name for each fact you use in the response. Use square brackets\
+  \ to reference the source, for example info1.txt. Dont combine sources, list each\
+  \ source separately, for example info1.txtinfo2.pdf.\n        \n        \n     \
+  \   \n\nUser How did crypto do last year?\nBot Summarize Cryptocurrency Market Dynamics\
+  \ from last year\nUser What are my health plans?\nBot Show available health plans\n\
+  Northwind_Standard_Benefits_Details.pdfpage59  If you are outside of Washington\
+  \ for more than 12 consecutive months, you may not be eligible for coverage of outofarea\
+  \ services. In this case, you may need to seek out a new plan that offers coverage\
+  \ in the state where you are living.It is important to note that Northwind Standard\
+  \ does not cover outofnetwork services outside of Washington. This means that you\
+  \ will need to find innetwork providers in the state where you are living to receive\
+  \ coverage. It is also important to keep in mind that the cost of care can vary\
+  \ widely outside of Washington. You should contact Northwind Health to get an estimate\
+  \ of the cost of care for services you may need. This can help you make an informed\
+  \ decision about where to obtain care. Finally, it is important to keep your Northwind\
+  \ Standard plan active while you are out of state. This will ensure that you remain\
+  \ eligible for coverage if you need to receive outof area care. By following the\
+  \ tips outlined above, you can ensure that you are prepared if you find yourself\
+  \ needing care outside of Washington.\nNorthwind_Standard_Benefits_Details.pdfpage59\
+  \  It is important to know that Northwind Standard does not provide coverage for\
+  \ non emergency services outside of Washington. That means you may be responsible\
+  \ for the full cost of care if you seek out care for a condition that could have\
+  \ been treated in Washington. In order to receive coverage for outofarea care, you\
+  \ must meet the following criteria  You must be outside of Washington for no more\
+  \ than 12 consecutive months  You must be more than 100 miles away from your primary\
+  \ care provider  Your plan must have been in effect for at least 6 months before\
+  \ you receive outofarea care If you meet the criteria listed above, you may be eligible\
+  \ for coverage of outofarea services. In order to receive coverage, you must contact\
+  \ Northwind Health in advance of receiving care. You must also obtain prior authorization\
+  \ for any care you wish to receive. If prior authorization is not obtained, you\
+  \ may be responsible for the full cost of care. If you are outside of Washington\
+  \ for more than 12 consecutive months, you may not be eligible for coverage of outofarea\
+  \ services.\nNorthwind_Standard_Benefits_Details.pdfpage60  By following the tips\
+  \ outlined above, you can ensure that you are prepared if you find yourself needing\
+  \ care outside of Washington. Northwind Standard provides coverage for outofarea\
+  \ emergency services, but it does not provide coverage for nonemergency services,\
+  \ outofnetwork services, or care received outside of Washington for more than 12\
+  \ consecutive months. Prior authorization must also be obtained in order to receive\
+  \ coverage. Keeping your plan active while out of state will also ensure that you\
+  \ remain eligible for coverage. CARE MANAGEMENT PriorAuthorization CARE MANAGEMENT\
+  \ Prior Authorization Northwind Standard includes Care Management services, which\
+  \ are designed to provide support, information, and proactive care for members.\
+  \ Specifically, this plan includes a Prior Authorization PA process for certain\
+  \ services. Prior Authorization is a process used by Northwind Health to make sure\
+  \ that a covered service is medically necessary and is the most costeffective way\
+  \ to receive the service. Before certain services are approved and covered, an authorization\
+  \ must be requested from Northwind Health.\n\nUser What does Northwind Standard\
+  \ not cover outside of Washington?\nBot"
 top_n: 1
 unique_model_id: gpt-4o
