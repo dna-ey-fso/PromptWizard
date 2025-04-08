@@ -13,6 +13,9 @@ path_to_config = "configs"
 promptopt_config_path = os.path.join(path_to_config, "promptopt_config.yaml")
 setup_config_path = os.path.join(path_to_config, "setup_config.yaml")
 
+TOKEN_COST_INPUT = 0.00000004
+TOKEN_COST_OUTPUT = 0.00000004
+
 class ConfigUpdateRequest(BaseModel):
     config_dict: dict
 
@@ -64,9 +67,17 @@ def get_best_prompt():
             generate_synthetic_examples=False
         )
 
+        # Calcul des tokens d'input et d'output
+        token_counts = gp.calculate_tokens(best_prompt, expert_profile)
+
         return {
             "best_prompt": best_prompt,
-            "expert_profile": expert_profile
+            "expert_profile": expert_profile,
+            "input_tokens": token_counts["input_tokens"] * TOKEN_COST_INPUT,
+            "output_tokens": token_counts["output_tokens"] * TOKEN_COST_OUTPUT,
+            "total_tokens": (token_counts["input_tokens"] * TOKEN_COST_INPUT  + token_counts["output_tokens"] * TOKEN_COST_OUTPUT)
         }
+
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}")

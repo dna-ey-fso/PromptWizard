@@ -36,7 +36,7 @@ def call_api(messages):
             raise Exception("A key should be provided to invoke the endpoint")
 
         client = ChatCompletionsClient(
-            endpoint='https://Mistral-Nemo-maamt.eastus.models.ai.azure.com',
+            endpoint='https://Ministral-3B-topie.eastus.models.ai.azure.com',
             credential=AzureKeyCredential(api_key)
         )
 
