@@ -16,61 +16,61 @@ refine_task_eg_iterations: 3
 seen_set_size: 20
 style_variation: 5
 task_description: "Optimize the prompt for clarity and relevance.\nQuestion: What\
-  \ is Northwind Health Plus?\nContent: Assistant helps the company employees with\
-  \ their healthcare plan questions, and questions about the employee handbook. Be\
-  \ brief in your answers.\n        Answer ONLY with the facts listed in the list\
-  \ of sources below. If there isnt enough information below, say you dont know. Do\
-  \ not generate answers that dont use the sources below. If asking a clarifying question\
-  \ to the user would help, ask the question.\n        For tabular information return\
-  \ it as an html table. Do not return markdown format. If the question is not in\
-  \ English, answer in the language used in the question.\n        Each source has\
-  \ a name followed by colon and the actual information, always include the source\
-  \ name for each fact you use in the response. Use square brackets to reference the\
-  \ source, for example info1.txt. Dont combine sources, list each source separately,\
-  \ for example info1.txtinfo2.pdf.\n        \n        \n        \n\nUser How did\
-  \ crypto do last year?\nBot Summarize Cryptocurrency Market Dynamics from last year\n\
-  User What are my health plans?\nBot Show available health plans\nNorthwind_Standard_Benefits_Details.pdfpage1\
-  \ Contoso Electronics Northwind Health Standard Plan Contoso ElectronicsThis document\
-  \ contains information generated using a language model Azure OpenAI. The information\
-  \ contained in this document is only for demonstration purposes and does not reflect\
-  \ the opinions or beliefs of Microsoft. Microsoft makes no representations or warranties\
-  \ of any kind, express or implied, about the completeness, accuracy, reliability,\
-  \ suitability or availability with respect to the information contained in this\
-  \ document. All rights reserved to MicrosoftSummary of Benefits Northwind Standard\
-  \ Northwind Standard is a basic plan that provides coverage for medical, vision,\
-  \ and dental services. This plan also offers coverage for preventive care services,\
-  \ as well as prescription drug coverage. With Northwind Standard, you can choose\
-  \ from a variety of innetwork providers, including primary care physicians, specialists,\
-  \ hospitals, and pharmacies. This plan does not offer coverage for emergency services,\
-  \ mental health and substance abuse coverage, or outofnetwork services.\nNorthwind_Standard_Benefits_Details.pdfpage98\
-  \  Right To And Payment Of Benefits OTHER INFORMATION ABOUT THIS PLAN Right To And\
-  \ Payment Of Benefits The Northwind Standard plan is a comprehensive health plan\
-  \ that provides coverage for medical, vision, and dental services. It also includes\
-  \ preventive care services and prescription drug coverage. Northwind Standard offers\
-  \ a variety of innetwork providers, including primary care physicians, specialists,\
-  \ hospitals, and pharmacies.Under this plan, Northwind Health will cover the cost\
-  \ of eligible services you receive, as long as you follow certain rules. Some services\
-  \ may require preauthorization or be subject to an annual deductible or coinsurance.\
-  \ Northwind Health is also responsible for processing and paying claims correctly.\
-  \ Right to Benefits You have the right to receive the benefits available under the\
-  \ Northwind Standard plan. This includes the right to receive services from any\
-  \ innetwork provider, subject to certain rules and regulations. You also have the\
-  \ right to be informed about the types of services that are covered and the costs\
-  \ associated with them. Payment of Benefits Northwind Health is responsible for\
-  \ paying claims correctly.\nNorthwind_Standard_Benefits_Details.pdfpage35  You should\
-  \ also be sure to communicate your needs to the therapist and discuss any potential\
-  \ risks or side effects. In addition to massage therapy, Northwind Health also offers\
-  \ coverage for other types of physical therapy, such as chiropractic care, physical\
-  \ therapy, and occupational therapy. These services can be used to help with pain\
-  \ relief, improve mobility, and reduce stress. At Contoso, we want our employees\
-  \ to take the time to care for their physical and mental health. We are proud to\
-  \ offer coverage for massage therapy and other physical therapy services through\
-  \ Northwind Health. With this coverage, you can get the care you need to feel your\
-  \ best.Mastectomy and Breast Reconstruction Maternity Care COVERED SERVICES Maternity\
-  \ Care At Northwind Health, we understand that having a baby can be costly and stressful.\
-  \ To help ease the burden, Northwind Standard offers comprehensive maternity care\
-  \ coverage. Prenatal Care Northwind Standard covers the costs of prenatal care for\
-  \ the mother, including routine visits with a doctor, laboratory tests, and ultrasounds.\n\
-  \nUser What is Northwind Health Plus?\nBot"
+  \ expenses does the Northwind Standard plan cover?\nContent: Assistant helps the\
+  \ company employees with their healthcare plan questions, and questions about the\
+  \ employee handbook. Be brief in your answers.\n        Answer ONLY with the facts\
+  \ listed in the list of sources below. If there isnt enough information below, say\
+  \ you dont know. Do not generate answers that dont use the sources below. If asking\
+  \ a clarifying question to the user would help, ask the question.\n        For tabular\
+  \ information return it as an html table. Do not return markdown format. If the\
+  \ question is not in English, answer in the language used in the question.\n   \
+  \     Each source has a name followed by colon and the actual information, always\
+  \ include the source name for each fact you use in the response. Use square brackets\
+  \ to reference the source, for example info1.txt. Dont combine sources, list each\
+  \ source separately, for example info1.txtinfo2.pdf.\n        \n        \n     \
+  \   \n\nNorthwind_Standard_Benefits_Details.pdfpage92  It is important for employees\
+  \ to be aware of any potential inaccuracies or false information that Northwind\
+  \ Health may use when discussing their plans in order to make the most informed\
+  \ decision possible. Member Cooperation MEMBER COOPERATION At Northwind Health,\
+  \ we understand that people are more likely to get the care they need when they\
+  \ are informed and empowered with the knowledge they need. That is why we have included\
+  \ the following information in our Northwind Standard plan to help inform and empower\
+  \ our members. When you sign up for the Northwind Standard plan, you are agreeing\
+  \ to certain responsibilities as a member of the plan. This includes being aware\
+  \ of the plans benefits and limitations, as well as your obligations under the plan.\
+  \ Covering Your Expenses When you are enrolled in Northwind Standard, your plan\
+  \ will cover a portion of your medical and vision expenses. However, you may be\
+  \ responsible for certain copayments or coinsurance amounts. It is important to\
+  \ be aware of the terms of your plan and to know what you will be responsible for\
+  \ so that you can plan for these expenses.\nNorthwind_Standard_Benefits_Details.pdfpage55\
+  \  When a therapeutic injection is covered by the Northwind Standard plan, the member\
+  \ should always confirm that the injection is being administered by a qualified\
+  \ healthcare provider in a medically appropriate setting. If a member has any questions\
+  \ about the therapeutic injection, they should contact the Northwind Health customer\
+  \ service team for more information. By understanding the coverage offered by the\
+  \ Northwind Standard plan, members can make informed decisions about their healthcare\
+  \ and ensure that they are getting the best possible care. Transplants COVERED SERVICES\
+  \  Transplants At Northwind Health, we understand how important it is to have access\
+  \ to the best possible care. Thats why our Northwind Standard plan provides coverage\
+  \ for organ and tissue transplants. If you need a transplant of any kind, Northwind\
+  \ Standard will cover the expenses associated with the procedure, including the\
+  \ cost of the donor organ, hospital stays, recovery costs, and medications. Its\
+  \ important to note that transplants are subject to certain criteria, including\
+  \ a determination of medical necessity, so its important to discuss your transplant\
+  \ needs with your primary care physician.\nNorthwind_Standard_Benefits_Details.pdfpage36\
+  \  Prenatal Care Northwind Standard covers the costs of prenatal care for the mother,\
+  \ including routine visits with a doctor, laboratory tests, and ultrasounds. In\
+  \ addition, Northwind Standard also covers any necessary vitamins, minerals, or\
+  \ other supplements that are prescribed by the doctor. Delivery Northwind Standard\
+  \ covers the costs of labor, delivery, and postdelivery care for both the mother\
+  \ and the baby. The plan also covers the costs of any necessary medications, blood\
+  \ transfusions, or anesthesia that may be required. Maternity Care After Delivery\
+  \ Northwind Standard covers the costs of any followup visits with the doctor and\
+  \ the baby. The plan also covers the costs of any necessary vaccines or immunizations\
+  \ for the baby. Exceptions Please note that Northwind Standard does not cover the\
+  \ costs of any elective or cosmetic procedures for the mother or the baby. Additionally,\
+  \ Northwind Standard does not cover the costs of any fertility treatments or in\
+  \ vitro fertilization procedures. Tips for Employees We recommend that employees\
+  \ begin planning for maternity care as soon as possible."
 top_n: 1
 unique_model_id: gpt-4o
