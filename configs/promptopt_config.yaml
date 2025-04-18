@@ -15,62 +15,61 @@ refine_instruction: true
 refine_task_eg_iterations: 3
 seen_set_size: 20
 style_variation: 5
-task_description: "Optimize the prompt for clarity and relevance.\nQuestion: What\
-  \ expenses does the Northwind Standard plan cover?\nContent: Assistant helps the\
-  \ company employees with their healthcare plan questions, and questions about the\
-  \ employee handbook. Be brief in your answers.\n        Answer ONLY with the facts\
-  \ listed in the list of sources below. If there isnt enough information below, say\
-  \ you dont know. Do not generate answers that dont use the sources below. If asking\
-  \ a clarifying question to the user would help, ask the question.\n        For tabular\
-  \ information return it as an html table. Do not return markdown format. If the\
-  \ question is not in English, answer in the language used in the question.\n   \
-  \     Each source has a name followed by colon and the actual information, always\
-  \ include the source name for each fact you use in the response. Use square brackets\
-  \ to reference the source, for example info1.txt. Dont combine sources, list each\
-  \ source separately, for example info1.txtinfo2.pdf.\n        \n        \n     \
-  \   \n\nNorthwind_Standard_Benefits_Details.pdfpage92  It is important for employees\
-  \ to be aware of any potential inaccuracies or false information that Northwind\
-  \ Health may use when discussing their plans in order to make the most informed\
-  \ decision possible. Member Cooperation MEMBER COOPERATION At Northwind Health,\
-  \ we understand that people are more likely to get the care they need when they\
-  \ are informed and empowered with the knowledge they need. That is why we have included\
-  \ the following information in our Northwind Standard plan to help inform and empower\
-  \ our members. When you sign up for the Northwind Standard plan, you are agreeing\
-  \ to certain responsibilities as a member of the plan. This includes being aware\
-  \ of the plans benefits and limitations, as well as your obligations under the plan.\
-  \ Covering Your Expenses When you are enrolled in Northwind Standard, your plan\
-  \ will cover a portion of your medical and vision expenses. However, you may be\
-  \ responsible for certain copayments or coinsurance amounts. It is important to\
-  \ be aware of the terms of your plan and to know what you will be responsible for\
-  \ so that you can plan for these expenses.\nNorthwind_Standard_Benefits_Details.pdfpage55\
-  \  When a therapeutic injection is covered by the Northwind Standard plan, the member\
-  \ should always confirm that the injection is being administered by a qualified\
-  \ healthcare provider in a medically appropriate setting. If a member has any questions\
-  \ about the therapeutic injection, they should contact the Northwind Health customer\
-  \ service team for more information. By understanding the coverage offered by the\
-  \ Northwind Standard plan, members can make informed decisions about their healthcare\
-  \ and ensure that they are getting the best possible care. Transplants COVERED SERVICES\
-  \  Transplants At Northwind Health, we understand how important it is to have access\
-  \ to the best possible care. Thats why our Northwind Standard plan provides coverage\
-  \ for organ and tissue transplants. If you need a transplant of any kind, Northwind\
-  \ Standard will cover the expenses associated with the procedure, including the\
-  \ cost of the donor organ, hospital stays, recovery costs, and medications. Its\
-  \ important to note that transplants are subject to certain criteria, including\
-  \ a determination of medical necessity, so its important to discuss your transplant\
-  \ needs with your primary care physician.\nNorthwind_Standard_Benefits_Details.pdfpage36\
-  \  Prenatal Care Northwind Standard covers the costs of prenatal care for the mother,\
-  \ including routine visits with a doctor, laboratory tests, and ultrasounds. In\
-  \ addition, Northwind Standard also covers any necessary vitamins, minerals, or\
-  \ other supplements that are prescribed by the doctor. Delivery Northwind Standard\
-  \ covers the costs of labor, delivery, and postdelivery care for both the mother\
-  \ and the baby. The plan also covers the costs of any necessary medications, blood\
-  \ transfusions, or anesthesia that may be required. Maternity Care After Delivery\
-  \ Northwind Standard covers the costs of any followup visits with the doctor and\
-  \ the baby. The plan also covers the costs of any necessary vaccines or immunizations\
-  \ for the baby. Exceptions Please note that Northwind Standard does not cover the\
-  \ costs of any elective or cosmetic procedures for the mother or the baby. Additionally,\
-  \ Northwind Standard does not cover the costs of any fertility treatments or in\
-  \ vitro fertilization procedures. Tips for Employees We recommend that employees\
-  \ begin planning for maternity care as soon as possible."
+task_description: "Optimize the prompt for clarity and relevance.\nQuestion: Can you\
+  \ give me more details about it ?\nContent: Assistant helps the company employees\
+  \ with their healthcare plan questions, and questions about the employee handbook.\
+  \ Be brief in your answers.\n        Answer ONLY with the facts listed in the list\
+  \ of sources below. If there isnt enough information below, say you dont know. Do\
+  \ not generate answers that dont use the sources below. If asking a clarifying question\
+  \ to the user would help, ask the question.\n        For tabular information return\
+  \ it as an html table. Do not return markdown format. If the question is not in\
+  \ English, answer in the language used in the question.\n        Each source has\
+  \ a name followed by colon and the actual information, always include the source\
+  \ name for each fact you use in the response. Use square brackets to reference the\
+  \ source, for example info1.txt. Dont combine sources, list each source separately,\
+  \ for example info1.txtinfo2.pdf.\n        \n        \n        \n\nNorthwind_Standard_Benefits_Details.pdfpage44\
+  \  If you have questions about coverage or are considering this type of surgery,\
+  \ it is important to contact your primary care physician or specialist. You can\
+  \ also contact Northwind Standard for more information about coverage and eligibility.\
+  \ Prescription Drug COVERED SERVICES Prescription Drugs The Northwind Standard plan\
+  \ provides coverage for prescription drugs. This includes both brand name and generic\
+  \ medications, as well as overthecounter drugs when prescribed by a doctor. Northwind\
+  \ Standard also provides coverage for immunizations and vaccinations. In order to\
+  \ receive coverage for prescription drugs, members must use one of Northwind Healths\
+  \ preferred pharmacies. Preferred pharmacies offer the lowest copayments, and they\
+  \ also provide additional cost savings benefits. To find a preferred pharmacy in\
+  \ your area, you can use the Find a Pharmacy tool on the Northwind Health website.\
+  \ When filling a prescription, you can choose to receive your medications through\
+  \ the mail. This option is convenient and can help you save money. You can also\
+  \ request prescription refills online or by phone, and you can even use a mobile\
+  \ app to manage your prescriptions.\nNorthwind_Standard_Benefits_Details.pdfpage23\
+  \  Clinical trials are research studies that look at new ways to prevent, detect,\
+  \ or treat diseases and conditions, and can give members access to treatments and\
+  \ therapies not yet available. Northwind Standard offers coverage for certain clinical\
+  \ trial services, including those related to common diseases and conditions. The\
+  \ Northwind Standard plan covers the cost of certain clinical trial services, and\
+  \ some of the most common include  Diagnostic testing and procedures to confirm\
+  \ or diagnose a condition or disease  Treatment of the condition or disease being\
+  \ studied  Medications  Lab services  Imaging services Any other clinical trial\
+  \ services that are not explicitly covered by the Northwind Standard plan may be\
+  \ eligible for coverage on a casebycase basis. To determine if a clinical trial\
+  \ service is covered, members should contact the Northwind Health customer service\
+  \ department for more information.Its important for members to note that the Northwind\
+  \ Standard plan does not cover travel expenses associated with attending clinical\
+  \ trials.\nNorthwind_Standard_Benefits_Details.pdfpage43  It is also a good idea\
+  \ to research the credentials of the surgeon you are considering, as well as the\
+  \ hospital or facility where the procedure will be performed.In addition, it is\
+  \ important to remember that recovery from orthognathic surgery may take several\
+  \ months, and you may need to take time off from work to heal. It is also important\
+  \ to note that some patients may experience pain, swelling, and discomfort during\
+  \ the recovery period. Finally, it is important to remember that orthognathic surgery\
+  \ is a major medical procedure, and it is important to be aware of the risks and\
+  \ potential complications. It is also important to discuss any concerns with your\
+  \ primary care physician or specialist before making a decision. Northwind Standard\
+  \ is committed to providing patients with quality care and coverage for orthognathic\
+  \ surgery. If you have questions about coverage or are considering this type of\
+  \ surgery, it is important to contact your primary care physician or specialist.\
+  \ You can also contact Northwind Standard for more information about coverage and\
+  \ eligibility."
 top_n: 1
 unique_model_id: gpt-4o
