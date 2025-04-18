@@ -20,7 +20,7 @@ The primary objective of this integration is to leverage FrugalGPT's cost optimi
 
 ## Project Architecture
 
-![Architecture](./image/archi.png)
+![Architecture](./images/archi.png)
 
 ---
 
